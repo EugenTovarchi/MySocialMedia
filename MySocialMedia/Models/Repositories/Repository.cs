@@ -21,9 +21,9 @@ namespace MySocialMedia.Models.Repositories
             throw new NotImplementedException();
         }
 
-        public T Get(int id)
+        public async Task<T> Get(int id)
         {
-            throw new NotImplementedException();
+            return await _db.Set<T>().FindAsync(id);
         }
 
         public IEnumerable<T> GetAll()
@@ -33,7 +33,7 @@ namespace MySocialMedia.Models.Repositories
 
         public void Update(T item)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); // шаг 4й логика обновления 
         }
     }
 }

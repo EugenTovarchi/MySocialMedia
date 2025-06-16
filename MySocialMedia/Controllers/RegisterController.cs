@@ -12,17 +12,21 @@ public class RegisterController : Controller
     private IMapper _mapper;
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
-    public RegisterController(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager)
+    private readonly ILogger<RegisterController> _logger;
+    public RegisterController(IMapper mapper, UserManager<User> userManager,
+        SignInManager<User> signInManager, ILogger<RegisterController> logger)
     {
         _mapper = mapper;
         _userManager = userManager;
         _signInManager = signInManager;
+        _logger = logger;
     }
 
     [Route("Register")]
     [HttpGet]
     public IActionResult Register()
     {
+        _logger.LogInformation("Зашли в IActionResult Register");   // используем всегда логер вместо CW ! 
         return View("Shared/Register");
     }
 

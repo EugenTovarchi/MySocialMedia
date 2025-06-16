@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MySocialMedia.Models;
 using MySocialMedia.Models.Repositories;
 using MySocialMedia.Views.ViewModels;
+using MySocialMedia.Views.ViewModels.Account;
 
 namespace MySocialMedia.Controllers;
 
@@ -27,13 +29,18 @@ public class AccountManagerController : Controller
         return View("Home/Login");
     }
 
+    /// <summary>
+    /// показываем форму входа и не выполняем саму аутентификацию.
+    /// </summary>
+    /// <param name="returnUrl"></param>
+    /// <returns></returns>
     [HttpGet]
     public IActionResult Login(string returnUrl = null)
     {
         return View(new LoginViewModel { ReturnUrl = returnUrl });
     }
 
-    [Route("Login")]
+    [Route("Login")]  
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
@@ -52,7 +59,7 @@ public class AccountManagerController : Controller
                 }
                 else
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("MyPage", "AccountManager");
                 }
             }
             else
@@ -70,5 +77,63 @@ public class AccountManagerController : Controller
     {
         await _signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
+    }
+
+    [Authorize]   //только авторизованные пользователи могут попасть на свою страницу.
+    [Route("MyPage")]
+    [HttpGet]
+    public IActionResult MyPage()
+    {
+        // Получаем объект пользователя из контекста HTTP-запроса
+        var user = User;
+
+        // Асинхронно получаем данные пользователя из базы через UserManager
+        var result = _userManager.GetUserAsync(user);
+
+        // Создаём ViewModel и передаём её в представление "User"
+        return View("User", new UserViewModel(result.Result));
+    }
+
+    [Authorize]
+    [Route("Update")]
+    [HttpPost]
+    public async Task<IActionResult> Update(UserEditViewModel model)
+    {
+        if (ModelState.IsValid)  //Проверяет валидационные атрибуты модели
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+
+            user.Convert(model);
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("MyPage", "AccountManager");
+            }
+            else
+            {
+                return RedirectToAction("Edit", "AccountManager");
+            }
+        }
+        else
+        {
+            ModelState.AddModelError("", "Некорректные данные");
+            return View("Edit", model);
+        }
+    }
+
+    /// <summary>
+    /// Поиск пользователей
+    /// </summary>
+    /// <returns></returns>
+    [Route("UserList")]
+    [HttpPost]
+    public IActionResult UserList()
+    {
+        var model = new SearchViewModel()
+        {
+            UserList = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().Contains(search)).ToList()
+        };
+        return View("UserList", model);
     }
 }
