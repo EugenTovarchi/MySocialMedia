@@ -95,7 +95,6 @@ public class AccountManagerController : Controller
         var result = _userManager.GetUserAsync(user);
 
         _logger.LogInformation($"My User: {result} авторизован");
-
         // Создаём ViewModel и передаём её в представление "User"
         return View("User", new UserViewModel(result.Result));
     }

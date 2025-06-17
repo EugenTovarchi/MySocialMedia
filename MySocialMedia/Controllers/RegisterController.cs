@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MySocialMedia.Models;
 using MySocialMedia.Views.ViewModels;
 
@@ -35,48 +33,9 @@ public class RegisterController : Controller
     [HttpGet]
     public IActionResult RegisterPart2(RegisterViewModel model)
     {
-        //return View("RegisterPart2", model);
-        //if (!ModelState.IsValid)
-        //{
-        //    _logger.LogInformation($"Ошибка во второй части регистрации! ");
-        //    return View("Shared/Register"); // Возврат на первую стадию при ошибках
-        //}
         _logger.LogInformation($"Вы во второй части регистрации! ");
         return View("RegisterPart2", model); // Показ второй стадии
     }
-
-    /// <summary>
-    /// возврат на вторую форму
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    //[Route("Register")]
-    //[HttpPost]
-    //public async Task<IActionResult> Register(RegisterViewModel model)
-    //{
-    //    if (ModelState.IsValid)
-    //    {
-    //        var user = _mapper.Map<User>(model);
-
-    //        var result = await _userManager.CreateAsync(user, model.PasswordReg);
-    //        if (result.Succeeded)
-    //        {
-    //            await _signInManager.SignInAsync(user, false);
-    //            _logger.LogInformation($"Пользователь {user.UserName} успешно прошёл регистрацибю.");
-    //            return RedirectToAction("MyPage", "AccountManager");
-    //        }
-    //        else
-    //        {
-    //            foreach (var error in result.Errors)
-    //            {
-    //                ModelState.AddModelError(string.Empty, error.Description);
-    //            }
-    //        }
-    //    }
-    //    return View("RegisterPart2", model);
-    //    // Если ошибки - остаёмся на текущей стадии
-    //    //return model.FirstName == null ? View("Shared/Register") : View("RegisterPart2", model);
-    //}
 
     [Route("Register")]
     [HttpPost]
