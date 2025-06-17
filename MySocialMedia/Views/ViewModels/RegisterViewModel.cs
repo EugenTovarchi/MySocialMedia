@@ -14,8 +14,13 @@ public class RegisterViewModel
     public string LastName { get; set; }
 
     [Required]
+    [EmailAddress(ErrorMessage = "Некорректный email")]
     [Display(Name = "Email")]
     public string EmailReg { get; set; }
+
+    // Делаем Login необязательным в форме (скрытым или вычисляемым)
+    [Display(Name = "Никнейм (будет равен email)")]
+    public string Login { get; set; }   // Автоматически берётся из EmailReg
 
     [Required]
     [Display(Name = "Год")]
@@ -41,7 +46,7 @@ public class RegisterViewModel
     [Display(Name = "Подтвердить пароль")]
     public string PasswordConfirm { get; set; }
 
-    [Required]
-    [Display(Name = "Никнейм")]
-    public string Login { get; set; }
+    //[Required]
+    //[Display(Name = "Никнейм")]
+    //public string Login { get; set; }
 }

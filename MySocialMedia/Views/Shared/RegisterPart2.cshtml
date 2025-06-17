@@ -42,6 +42,13 @@
         </div>
         <div>
             <div class="mrgn">
+                <input asp-for="Login" class="form-control" placeholder="Придумайте никнейм" />
+                <span asp-validation-for="Login" class="text-danger"></span>
+            </div>
+        </div>
+        
+        <div>
+            <div class="mrgn">
                 <input asp-for="PasswordReg" class="form-control" />
                 <span asp-validation-for="PasswordReg" class="text-danger"></span>
             </div>
@@ -53,7 +60,10 @@
             </div>
         </div>
         <div class="center">
-            <input class="btn_submit" type="submit" value="Регистрация" />
+            @* <input class="btn_submit" type="submit" value="Завершить регистрацию" /> *@
+            <form asp-action="Register" asp-controller="Register" method="post">
+                <button type="submit">Завершить регистрацию</button>
+            </form>
         </div>
     </form>
 </div>

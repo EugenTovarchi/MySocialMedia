@@ -41,7 +41,9 @@ namespace MySocialMedia
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            builder.WebHost.UseUrls("http://localhost:5275", "https://localhost:7285"); //добавил порты явно из-за ошибки логирования
+
+            //app.UseHttpsRedirection();
             app.UseRouting();
 
             app.UseAuthentication();

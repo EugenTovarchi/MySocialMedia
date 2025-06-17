@@ -14,12 +14,15 @@ public class AccountManagerController : Controller
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly IMapper _mapper;
+    private readonly ILogger<AccountManagerController> _logger;
 
-    public AccountManagerController(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper)
+    public AccountManagerController(UserManager<User> userManager, SignInManager<User> signInManager,
+        IMapper mapper, ILogger<AccountManagerController> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _mapper =   mapper;
+        _logger = logger;
     }
 
     [Route("Login")]
@@ -43,7 +46,7 @@ public class AccountManagerController : Controller
     [Route("Login")]  
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel model)
+    public async Task<IActionResult> Login(LoginViewModel model, ILogger<AccountManagerController> logger)
     {
         if (ModelState.IsValid)
         {
@@ -59,6 +62,7 @@ public class AccountManagerController : Controller
                 }
                 else
                 {
+                    _logger.LogInformation("Пользователь вошел в систему!Метод Login - Post");
                     return RedirectToAction("MyPage", "AccountManager");
                 }
             }
@@ -67,7 +71,7 @@ public class AccountManagerController : Controller
                 ModelState.AddModelError("", "Неправильный логин и (или) пароль");
             }
         }
-        return View("Views/Home/Index.cshtml");
+        return View("model"); //Views/Home/Index.cshtml
     }
 
     [Route("Logout")]
@@ -89,6 +93,8 @@ public class AccountManagerController : Controller
 
         // Асинхронно получаем данные пользователя из базы через UserManager
         var result = _userManager.GetUserAsync(user);
+
+        _logger.LogInformation($"My User: {result} авторизован");
 
         // Создаём ViewModel и передаём её в представление "User"
         return View("User", new UserViewModel(result.Result));
@@ -128,7 +134,7 @@ public class AccountManagerController : Controller
     /// <returns></returns>
     [Route("UserList")]
     [HttpPost]
-    public IActionResult UserList()
+    public IActionResult UserList(string search)
     {
         var model = new SearchViewModel()
         {
