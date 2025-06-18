@@ -1,39 +1,53 @@
-﻿using MySocialMedia.Models.Repositoriesж;
+﻿using Microsoft.EntityFrameworkCore;
+using MySocialMedia.Models.Repositoriesж;
 
 namespace MySocialMedia.Models.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private ApplicationDbContext _db;
+        protected DbContext _db;
+
+        public DbSet<T> Set
+        {
+            get;
+            private set;
+        }
 
         public Repository(ApplicationDbContext db)
         {
-                _db = db;
+            _db = db;
+            var set = _db.Set<T>();
+            set.Load();
+
+            Set = set;
         }
-       
+
         public void Create(T item)
         {
-            throw new NotImplementedException();
+            Set.Add(item);
+            _db.SaveChanges();
         }
 
-        public void Delete(int id)
+        public void Delete(T item)
         {
-            throw new NotImplementedException();
+            Set.Remove(item);
+            _db.SaveChanges();
         }
 
-        public async Task<T> Get(int id)
+        public T Get(int id)
         {
-            return await _db.Set<T>().FindAsync(id);
+            return Set.Find(id);
         }
 
         public IEnumerable<T> GetAll()
         {
-            throw new NotImplementedException();
+            return Set;
         }
 
         public void Update(T item)
         {
-            throw new NotImplementedException(); // шаг 4й логика обновления 
+            Set.Update(item);
+            _db.SaveChanges();
         }
     }
 }

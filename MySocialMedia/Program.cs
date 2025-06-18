@@ -1,8 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MySocialMedia.Extensions;
 using MySocialMedia.Models;
 using MySocialMedia.Models.Repositories;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace MySocialMedia
 {
@@ -17,7 +19,13 @@ namespace MySocialMedia
 
             builder.Services.AddDbContext<ApplicationDbContext>
                 (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            
+
+            builder.Services
+                       .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")))
+                       .AddUnitOfWork()
+                       .AddCustomRepository<Friend, FriendsRepository>();
+
+            builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
             builder.Services.AddIdentity<User, IdentityRole>(opts =>
             {
@@ -29,7 +37,7 @@ namespace MySocialMedia
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            builder.Services.AddAutoMapper(typeof(Program).Assembly);
+            
 
             var app = builder.Build();
 

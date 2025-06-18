@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MySocialMedia.Extensions;
 using MySocialMedia.Models;
 using MySocialMedia.Models.Repositories;
+using MySocialMedia.Models.Repositoriesж;
 using MySocialMedia.Views.ViewModels;
 using MySocialMedia.Views.ViewModels.Account;
 
-namespace MySocialMedia.Controllers;
+namespace MySocialMedia.Controllers.Account;
 
 public class AccountManagerController : Controller
 {
@@ -21,7 +23,7 @@ public class AccountManagerController : Controller
     {
         _userManager = userManager;
         _signInManager = signInManager;
-        _mapper =   mapper;
+        _mapper = mapper;
         _logger = logger;
     }
 
@@ -43,7 +45,7 @@ public class AccountManagerController : Controller
         return View(new LoginViewModel { ReturnUrl = returnUrl });
     }
 
-    [Route("Login")]  
+    [Route("Login")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model, ILogger<AccountManagerController> logger)
@@ -53,7 +55,7 @@ public class AccountManagerController : Controller
 
             var user = _mapper.Map<User>(model);
 
-            var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, false);
+            var result = await _signInManager.PasswordSignInAsync(user.Email, model.Password, model.RememberMe, false);
             if (result.Succeeded)
             {
                 if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
@@ -132,13 +134,62 @@ public class AccountManagerController : Controller
     /// </summary>
     /// <returns></returns>
     [Route("UserList")]
-    [HttpPost]
-    public IActionResult UserList(string search)
+    [HttpGet]
+    public async Task<IActionResult> UserList(string search)
     {
+        var model = await CreateSearch(search);
+        return View("UserList", model);
+    }
+
+    private async Task<SearchViewModel> CreateSearch(string search)
+    {
+        var currentuser = User;
+        var result = await _userManager.GetUserAsync(currentuser);
+
+        var list = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
+        var withfriend = await GetAllFriend();
+
+        var data = new List<UserWithFriendExt>();
+        list.ForEach(x =>
+        {
+            var t = _mapper.Map<UserWithFriendExt>(x);
+            t.IsFriendWithCurrent = withfriend.Where(y => y.Id == x.Id || x.Id == result.Id).Count() != 0;
+            data.Add(t);
+        });
+
         var model = new SearchViewModel()
         {
-            UserList = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().Contains(search)).ToList()
+            UserList = data
         };
-        return View("UserList", model);
+        return model;
+    }
+
+    private async Task<List<User>> GetAllFriend()
+    {
+        var user = User;
+
+        var result = await _userManager.GetUserAsync(user);
+
+        var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+        return repository.GetFriendsByUser(result);
+    }
+
+    [Route("AddFriend")]
+    [HttpPost]
+    public async Task<IActionResult> AddFriend(string id)
+    {
+        var currentuser = User;
+
+        var result = await _userManager.GetUserAsync(currentuser);
+
+        var friend = await _userManager.FindByIdAsync(id);
+
+        var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+        repository.AddFriend(result, friend);
+
+        return RedirectToAction("MyPage", "AccountManager");
+
     }
 }

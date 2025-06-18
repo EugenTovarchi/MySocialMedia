@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySocialMedia.Models;
 using MySocialMedia.Views.ViewModels;
 
-namespace MySocialMedia.Controllers;
+namespace MySocialMedia.Controllers.Account;
 
 public class RegisterController : Controller
 {
