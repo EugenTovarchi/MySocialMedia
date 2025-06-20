@@ -22,7 +22,7 @@ namespace MySocialMedia
                   ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services
                 .AddUnitOfWork()
@@ -65,19 +65,12 @@ namespace MySocialMedia
                 app.UseHsts();
             }
 
-            builder.WebHost.UseUrls("http://localhost:5275", "https://localhost:7285"); //добавил порты явно из-за ошибки логирования
-
-            //app.UseHttpsRedirection();
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
-
             app.MapStaticAssets();
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")

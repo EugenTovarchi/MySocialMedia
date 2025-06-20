@@ -1,7 +1,7 @@
 ﻿@model MySocialMedia.ViewModels.Account.UserViewModel
 
-<meta http-equiv="refresh" content="5">
-
+@* <meta http-equiv="refresh" content="5">
+ *@
 @{
     ViewData["Title"] = "Личный кабинет";
     Layout = "_Layout";
@@ -9,6 +9,9 @@
 
 <div class="block-reg background-white">
     <h4>Добро пожаловать, @Model.User.GetFullName()!</h4>
+    <div>
+        <a asp-controller="AccountManager" asp-action="Update" class="btn btn-primary" method="post">Редактировать профиль </a>
+    </div>
 
     <div>
         <img src="@Model.User.Image" alt="Фото профиля" />
@@ -52,7 +55,4 @@
             </div>
         }
     </div>
-    
-
-    <a asp-controller="AccountManager" asp-action="Edit">Редактировать профиль</a>
 </div>

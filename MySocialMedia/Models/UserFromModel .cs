@@ -7,7 +7,7 @@ public static class UserFromModel
 {
     public static User Convert(this User user, UserEditViewModel usereditvm)
     {
-        user.Image = usereditvm.Image;
+        user.Image = usereditvm.Image;  //как изменить ?  добавить прикрепить или вставить ссылку ? 
         user.LastName = usereditvm.LastName;
         user.MiddleName = usereditvm.MiddleName;
         user.FirstName = usereditvm.FirstName;

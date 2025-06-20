@@ -11,6 +11,7 @@ using MySocialMedia.ViewModels.Account;
 
 namespace MySocialMedia.Controllers.Account;
 
+[Route("AccountManager")]
 public class AccountManagerController : Controller
 {
     private readonly UserManager<User> _userManager;
@@ -69,7 +70,7 @@ public class AccountManagerController : Controller
             }
 
             var result = await _signInManager.PasswordSignInAsync(   
-                user.UserName, // Используем UserName вместо Email
+                user.UserName, 
                 model.Password,
                 model.RememberMe,
                 lockoutOnFailure: false);
@@ -95,17 +96,23 @@ public class AccountManagerController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    [Authorize]
     [Route("Update")]
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Update(UserEditViewModel model)
     {
-        if (ModelState.IsValid)  //Проверяет валидационные атрибуты модели
+        _logger.LogInformation("Запрос получен. ModelState: {@ModelState}", ModelState);
+        _logger.LogInformation("Данные модели: {@Model}", model);
+        _logger.LogInformation("Начало обработки Update для пользователя {UserId}", model.UserId);
+
+        if (ModelState.IsValid)
         {
             var user = await _userManager.FindByIdAsync(model.UserId);
 
+            _logger.LogInformation("Входим в user.Convert()");
             user.Convert(model);
 
+            _logger.LogInformation("Вышли из Конверта и применяем изменения в result");
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
@@ -121,7 +128,85 @@ public class AccountManagerController : Controller
             ModelState.AddModelError("", "Некорректные данные");
             return View("Edit", model);
         }
+        //if (!ModelState.IsValid)
+        //{
+        //    return View("Edit", model);
+        //}
+
+        //var user = await _userManager.FindByIdAsync(model.UserId);
+        //if (user == null)
+        //{
+        //    _logger.LogInformation("user = null в методе Update");
+        //    return NotFound();
+        //}
+
+        //// Обновляем данные через extension method
+
+        //user.Convert(model);
+
+        //var result = await _userManager.UpdateAsync(user);
+        //if (!result.Succeeded)
+        //{
+        //    foreach (var error in result.Errors)
+        //    {
+        //        ModelState.AddModelError(string.Empty, error.Description);
+        //    }
+        //    return View("Edit", model);
+        //}
+
+        //return RedirectToAction("MyPage");
     }
+
+    //[Authorize]
+    //[HttpPost("Update")]
+    //[ValidateAntiForgeryToken]  //механизм защиты от CSRF (Cross-Site Request Forgery) атак. 
+    //public async Task<IActionResult> Update(UserEditViewModel model)
+    //{
+    //    _logger.LogInformation("Запрос получен. ModelState: {@ModelState}", ModelState);
+    //    _logger.LogInformation("Данные модели: {@Model}", model);
+    //    _logger.LogInformation("Начало обработки Update для пользователя {UserId}", model.UserId);
+
+    //    if (!ModelState.IsValid)
+    //    {
+    //        _logger.LogWarning("Модель не валидна. Ошибки: {@Errors}",
+    //            ModelState.Values.SelectMany(v => v.Errors));
+    //        return View("Edit", model);
+    //    }
+
+    //    try
+    //    {
+    //        var user = await _userManager.FindByIdAsync(model.UserId);
+    //        if (user == null)
+    //        {
+    //            _logger.LogError("Пользователь {UserId} не найден", model.UserId);
+    //            return NotFound();
+    //        }
+
+    //        // Обновляем данные
+    //        user.Convert(model);
+
+    //        var result = await _userManager.UpdateAsync(user);
+    //        if (!result.Succeeded)
+    //        {
+    //            foreach (var error in result.Errors)
+    //            {
+    //                ModelState.AddModelError(string.Empty, error.Description);
+    //                _logger.LogError("Ошибка Identity: {Error}", error.Description);
+    //            }
+    //            return View("Edit", model);
+    //        }
+
+    //        _logger.LogInformation("Профиль пользователя {UserId} успешно обновлен", user.Id);
+    //        return RedirectToAction("MyPage");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Ошибка при обновлении профиля");
+    //        ModelState.AddModelError("", "Произошла ошибка при обновлении");
+    //        return View("Edit", model);
+    //    }
+    //}
+
 
     /// <summary>
     /// Поиск пользователей
@@ -135,53 +220,7 @@ public class AccountManagerController : Controller
         return View("UserList", model);
     }
 
-    private async Task<SearchViewModel> CreateSearch(string search)
-    {
-        var currentuser = User;
-        var result = await _userManager.GetUserAsync(currentuser);
-
-
-        var list = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
-        if (!string.IsNullOrEmpty(search))
-        {
-            list = list.Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
-        }
-      
-        var withfriend = await GetAllFriend();
-
-        var data = new List<UserWithFriendExt>();
-        list.ForEach(x =>
-        {
-            var t = _mapper.Map<UserWithFriendExt>(x);
-            t.IsFriendWithCurrent = withfriend.Where(y => y.Id == x.Id || x.Id == result.Id).Count() != 0;
-            data.Add(t);
-        });
-
-        var model = new SearchViewModel()
-        {
-            UserList = data
-        };
-        return model;
-    }
-
-    private async Task<List<User>> GetAllFriend()
-    {
-        var user = User;
-
-        var result = await _userManager.GetUserAsync(user);
-
-        var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
-
-        return repository.GetFriendsByUser(result);
-    }
-
-    private async Task<List<User>> GetAllFriend(User user)
-    {
-        var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
-
-        return repository.GetFriendsByUser(user);
-    }
-
+   
 
     [Route("AddFriend")]
     [HttpPost]
@@ -342,4 +381,52 @@ public class AccountManagerController : Controller
             return View(new MainViewModel());
         }
     }
+
+    private async Task<SearchViewModel> CreateSearch(string search)
+    {
+        var currentuser = User;
+        var result = await _userManager.GetUserAsync(currentuser);
+
+
+        var list = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
+        if (!string.IsNullOrEmpty(search))
+        {
+            list = list.Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
+        }
+
+        var withfriend = await GetAllFriend();
+
+        var data = new List<UserWithFriendExt>();
+        list.ForEach(x =>
+        {
+            var t = _mapper.Map<UserWithFriendExt>(x);
+            t.IsFriendWithCurrent = withfriend.Where(y => y.Id == x.Id || x.Id == result.Id).Count() != 0;
+            data.Add(t);
+        });
+
+        var model = new SearchViewModel()
+        {
+            UserList = data
+        };
+        return model;
+    }
+
+    private async Task<List<User>> GetAllFriend()
+    {
+        var user = User;
+
+        var result = await _userManager.GetUserAsync(user);
+
+        var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+        return repository.GetFriendsByUser(result);
+    }
+
+    private async Task<List<User>> GetAllFriend(User user)
+    {
+        var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+        return repository.GetFriendsByUser(user);
+    }
+
 }

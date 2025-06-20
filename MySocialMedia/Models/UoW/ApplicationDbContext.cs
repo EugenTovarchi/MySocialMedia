@@ -10,8 +10,9 @@ namespace MySocialMedia.Models.UoW;
 public class ApplicationDbContext : IdentityDbContext<User>
 {
     public DbSet<Friend> Friends { get; set; }
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)  
     {
+        Database.Migrate();             //при выходе из конструктора : Страница не найдена без ошибок в логе
     }
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -26,7 +27,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasForeignKey(m => m.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Entity<Friend>()  //при запуске выскакивала ошибка про множественные циклы и нужно было выбрать каскадное удаление или обновление
+        builder.Entity<Friend>()  
            .HasOne(m => m.CurrentFriend)
            .WithMany()
            .HasForeignKey(m => m.CurrentFriendId)

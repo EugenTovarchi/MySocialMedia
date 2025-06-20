@@ -1,12 +1,18 @@
 ﻿@model MySocialMedia.ViewModels.Account.UserEditViewModel
 
+@* Заменил аджаксы ибо были устаревшие *@
+<script src="https://ajax.aspnetcdn.com/ajax/jquery.validation.unobtrusive/3.2.10/jquery.validate.unobtrusive.min.js"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+        defer></script>
 
-<script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.17.0/jquery.validate.min.js"></script>
-<script src="https://ajax.aspnetcdn.com/ajax/jquery.validation.unobtrusive/3.2.10/jquery.validate.unobtrusive.min.js"></script>
 
 <div class="block-reg background-white">
     <h3 class="center">Редактирование пользователя</h3>
-    <form class="frm" method="post" asp-controller="AccountManager" asp-action="Update">
+   @*  <form class="frm" method="post" asp-controller="AccountManager" asp-action="Update"> *@
+    <form method="post" asp-controller="AccountManager" asp-action="Update">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="UserId" />
         <div asp-validation-summary="ModelOnly"></div>
         <div>
             <div class="mrgn">
@@ -63,7 +69,7 @@
             </div>
         </div>
         <div class="center">
-            <input class="btn_submit" type="submit" value="Сохранить" />
+            <input class="btn_submit" type="submit" value="Сохранить" />  @* А где применение ?  *@
         </div>
     </form>
 </div>
