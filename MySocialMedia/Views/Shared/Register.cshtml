@@ -1,8 +1,10 @@
-﻿@{
+﻿@using MySocialMedia.ViewModels.Account
+@model MySocialMedia.ViewModels.Account.RegisterViewModel
+
+@{
     ViewData["Title"] = "Register";
 }
 
-@model MySocialMedia.Views.ViewModels.RegisterViewModel
 
 <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.17.0/jquery.validate.min.js"></script>
 <script src="https://ajax.aspnetcdn.com/ajax/jquery.validation.unobtrusive/3.2.10/jquery.validate.unobtrusive.min.js"></script>
@@ -12,7 +14,7 @@
     <div class="center text-color-gray">Регистрация нового пользователя</div>
     <form class="frm" method="get" asp-controller="Register" asp-action="RegisterPart2">
         <div asp-validation-summary="ModelOnly"></div>
-        <div>
+        @* <div>
             <div class="mrgn">
                 <input asp-for="FirstName" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
@@ -23,6 +25,18 @@
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
+        </div> *@
+
+        <div class="form-group">
+            <label asp-for="FirstName"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="LastName"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
 
         <div class="text-color-gray text-size_12">Дата рождения</div>
@@ -32,7 +46,7 @@
             </select>
             <span asp-validation-for="Date" class="text-danger"></span>
 
-            <select asp-for="Month" class="form-control date_control" asp-items="Html.GetEnumSelectList<MySocialMedia.Views.ViewModels.Months>()" onchange="PopulateDays()" ID="ddlMonth">
+            <select asp-for="Month" class="form-control date_control" asp-items="Html.GetEnumSelectList<Months>()" onchange="PopulateDays()" ID="ddlMonth">
                 <option value="">@Model.Month</option>
             </select>
 

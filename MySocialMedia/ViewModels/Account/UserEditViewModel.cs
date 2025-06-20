@@ -1,4 +1,4 @@
-﻿namespace MySocialMedia.Views.ViewModels.Account;
+﻿namespace MySocialMedia.ViewModels.Account;
 
 public class UserEditViewModel
 {

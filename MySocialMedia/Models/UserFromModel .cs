@@ -1,4 +1,5 @@
-﻿using MySocialMedia.Views.ViewModels.Account;
+﻿using MySocialMedia.Models.Users;
+using MySocialMedia.ViewModels.Account;
 
 namespace MySocialMedia.Models;
 

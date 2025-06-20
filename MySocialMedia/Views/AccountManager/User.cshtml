@@ -1,0 +1,58 @@
+﻿@model MySocialMedia.ViewModels.Account.UserViewModel
+
+<meta http-equiv="refresh" content="5">
+
+@{
+    ViewData["Title"] = "Личный кабинет";
+    Layout = "_Layout";
+}
+
+<div class="block-reg background-white">
+    <h4>Добро пожаловать, @Model.User.GetFullName()!</h4>
+
+    <div>
+        <img src="@Model.User.Image" alt="Фото профиля" />
+    </div>
+
+    <div>
+        <label>Email: @Model.User.Email</label>
+    </div>
+
+    <div>
+        <label>Статус: @Model.User.Status</label>
+    </div>
+    <div >
+       
+        @foreach (var user in @Model.Friends)
+        {
+            <div>
+                <div class="mrgn center-align">
+                    <img src="@user.Image" class="ava" />
+                </div>
+                
+                <div class="mrgn center-align">
+                    @user.GetFullName()
+                </div>
+
+                <div class="mrgn center-align">
+                    <form asp-controller="AccountManager" asp-action="Chat" asp-route-id="@user.Id" method="post">
+                        <button type="submit" class="btn btn-sm btn-primary min-width-but">
+                            Чат
+                        </button>
+                    </form>
+                </div>
+
+                <div class="mrgn center-align">
+                    <form asp-controller="AccountManager" asp-action="DeleteFriend" asp-route-id="@user.Id" method="post">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            Удалить из друзей
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+    
+
+    <a asp-controller="AccountManager" asp-action="Edit">Редактировать профиль</a>
+</div>

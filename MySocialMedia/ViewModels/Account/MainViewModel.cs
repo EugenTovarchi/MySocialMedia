@@ -1,4 +1,4 @@
-﻿namespace MySocialMedia.Views.ViewModels
+﻿namespace MySocialMedia.ViewModels.Account
 {
     public class MainViewModel
     {
@@ -10,5 +10,7 @@
             LoginView = new LoginViewModel();
             RegisterView = new RegisterViewModel();
         }
+
+        public string FullName { get; set; }
     }
 }

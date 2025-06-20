@@ -3,7 +3,7 @@ using MySocialMedia.Extensions;
 using MySocialMedia.Models;
 using MySocialMedia.Models.Repositories;
 
-namespace MySocialMedia.Views.ViewModels.Account;
+namespace MySocialMedia.ViewModels.Account;
 
 public class SearchViewModel
 {

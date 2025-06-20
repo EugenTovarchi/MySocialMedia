@@ -1,4 +1,4 @@
-﻿@model MySocialMedia.Views.ViewModels.RegisterViewModel
+﻿@model MySocialMedia.ViewModels.Account.RegisterViewModel
 
 @{
     ViewData["Title"] = "Register";
@@ -60,7 +60,6 @@
             </div>
         </div>
         <div class="center">
-            @* <input class="btn_submit" type="submit" value="Завершить регистрацию" /> *@
             <form asp-action="Register" asp-controller="Register" method="post">
                 <button type="submit">Завершить регистрацию</button>
             </form>

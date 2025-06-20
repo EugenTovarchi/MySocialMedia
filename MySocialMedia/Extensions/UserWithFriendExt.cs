@@ -1,4 +1,4 @@
-﻿using MySocialMedia.Models;
+﻿using MySocialMedia.Models.Users;
 
 namespace MySocialMedia.Extensions;
 

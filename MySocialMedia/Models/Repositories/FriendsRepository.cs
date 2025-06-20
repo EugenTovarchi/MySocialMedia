@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using MySocialMedia.Models.UoW;
+using MySocialMedia.Models.Users;
 
 namespace MySocialMedia.Models.Repositories;
 

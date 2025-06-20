@@ -1,10 +1,11 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using MySocialMedia.Extensions;
-using MySocialMedia.Models;
 using MySocialMedia.Models.Repositories;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using MySocialMedia.Models.UoW;
+using MySocialMedia.Models.Users;
 
 namespace MySocialMedia
 {
@@ -17,27 +18,42 @@ namespace MySocialMedia
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddDbContext<ApplicationDbContext>
-                (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                  ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
 
             builder.Services
-                       .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")))
-                       .AddUnitOfWork()
-                       .AddCustomRepository<Friend, FriendsRepository>();
+                .AddUnitOfWork()
+                .AddCustomRepository<Friend, FriendsRepository>();
 
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
-            builder.Services.AddIdentity<User, IdentityRole>(opts =>
+            builder.Services.ConfigureApplicationCookie(options =>
             {
-                opts.Password.RequiredLength = 5;
-                opts.Password.RequireNonAlphanumeric = false;
-                opts.Password.RequireLowercase = false;
-                opts.Password.RequireUppercase = false;
-                opts.Password.RequireDigit = false;
-            })
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.LoginPath = "/AccountManager/Login";
+                options.AccessDeniedPath = "/AccountManager/AccessDenied";
+                options.SlidingExpiration = true;
+            });
 
-            
+
+            builder.Services.AddIdentity<User, IdentityRole>(options => {
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 6;
+            })
+                 .AddEntityFrameworkStores<ApplicationDbContext>()
+                 .AddDefaultTokenProviders();
+
+                            builder.Services.AddControllersWithViews()
+                    .AddRazorOptions(options =>
+                    {
+                        options.ViewLocationFormats.Add("/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
+                        options.ViewLocationFormats.Add("/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
+                    });
 
             var app = builder.Build();
 
@@ -56,6 +72,10 @@ namespace MySocialMedia
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.MapStaticAssets();
             app.MapControllerRoute(

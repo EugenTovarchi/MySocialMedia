@@ -1,6 +1,6 @@
 ﻿using MySocialMedia.Models.Repositories;
 
-namespace MySocialMedia.Models.Repositoriesж
+namespace MySocialMedia.Models.UoW
 {
     /// <summary>
     /// хранилище всех репозиториев проекта.  UnitOfWork паттерн

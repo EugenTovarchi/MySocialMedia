@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Infrastructure;
-using MySocialMedia.Models.Repositoriesж;
+using MySocialMedia.Models.Repositories;
 
-namespace MySocialMedia.Models.Repositories;
+namespace MySocialMedia.Models.UoW;
 
 public class UnitOfWork : IUnitOfWork
 {
@@ -11,7 +11,7 @@ public class UnitOfWork : IUnitOfWork
 
     public UnitOfWork(ApplicationDbContext app)
     {
-        this._appContext = app;
+        _appContext = app;
     }
 
     public void Dispose()

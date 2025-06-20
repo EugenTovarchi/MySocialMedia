@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MySocialMedia.Models.Users;
 
-namespace MySocialMedia.Models;
+namespace MySocialMedia.Configs;
 
 public class FriendConfiguration : IEntityTypeConfiguration<Friend>
 {

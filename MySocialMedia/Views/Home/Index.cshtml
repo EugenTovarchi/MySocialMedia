@@ -1,16 +1,22 @@
-﻿﻿@using Microsoft.AspNetCore.Identity;
+﻿@model MySocialMedia.ViewModels.Account.MainViewModel
+
+@using MySocialMedia.Models.Users
+@using MySocialMedia.ViewModels
+@using MySocialMedia.ViewModels.Account
+
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager;
 
-@model MySocialMedia.Views.ViewModels.MainViewModel;
 
 @{
     ViewData["Title"] = "Home Page";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "_Layout";
 }
 @if (SignInManager.IsSignedIn(User))
 {
-    <div>Hello @User.Identity!</div>
+    var user = await UserManager.GetUserAsync(User);
+    var fullName = $"{user?.FirstName} {user?.LastName}";
+    <h1>@(string.IsNullOrEmpty(fullName.Trim()) ? "Добро пожаловать!" : $"Добро пожаловать, {fullName}!")</h1>
 }
 else
 {

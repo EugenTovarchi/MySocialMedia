@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MySocialMedia.Models.Repositoriesж;
+using MySocialMedia.Models.UoW;
 
 namespace MySocialMedia.Models.Repositories
 {

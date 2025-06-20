@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MySocialMedia.Views.ViewModels;
+namespace MySocialMedia.ViewModels.Account;
 
 public enum Months
 {

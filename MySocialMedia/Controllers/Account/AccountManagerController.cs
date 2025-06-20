@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using MySocialMedia.Extensions;
 using MySocialMedia.Models;
 using MySocialMedia.Models.Repositories;
-using MySocialMedia.Models.Repositoriesж;
-using MySocialMedia.Views.ViewModels;
-using MySocialMedia.Views.ViewModels.Account;
+using MySocialMedia.Models.UoW;
+using MySocialMedia.Models.Users;
+using MySocialMedia.ViewModels.Account;
 
 namespace MySocialMedia.Controllers.Account;
 
@@ -17,14 +17,34 @@ public class AccountManagerController : Controller
     private readonly SignInManager<User> _signInManager;
     private readonly IMapper _mapper;
     private readonly ILogger<AccountManagerController> _logger;
+    private readonly IUnitOfWork _unitOfWork;
 
     public AccountManagerController(UserManager<User> userManager, SignInManager<User> signInManager,
-        IMapper mapper, ILogger<AccountManagerController> logger)
+        IMapper mapper, ILogger<AccountManagerController> logger, IUnitOfWork unitOfWork)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _mapper = mapper;
         _logger = logger;
+        _unitOfWork = unitOfWork;
+    }
+    [Route("Generate")]
+    [HttpGet]
+    public async Task<IActionResult> Generate()
+    {
+
+        var usergen = new GenetateUsers();
+        var userlist = usergen.Populate(35);
+
+        foreach (var user in userlist)
+        {
+            var result = await _userManager.CreateAsync(user, "123456");
+
+            if (!result.Succeeded)
+                continue;
+        }
+
+        return RedirectToAction("Index", "Home");
     }
 
     [Route("Login")]
@@ -34,46 +54,36 @@ public class AccountManagerController : Controller
         return View("Home/Login");
     }
 
-    /// <summary>
-    /// показываем форму входа и не выполняем саму аутентификацию.
-    /// </summary>
-    /// <param name="returnUrl"></param>
-    /// <returns></returns>
-    [HttpGet]
-    public IActionResult Login(string returnUrl = null)
-    {
-        return View(new LoginViewModel { ReturnUrl = returnUrl });
-    }
-
-    [Route("Login")]
     [HttpPost]
+    [Route("Login")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel model, ILogger<AccountManagerController> logger)
+    public async Task<IActionResult> Login(LoginViewModel model)
     {
-        if (ModelState.IsValid)
+        if (ModelState.IsValid)   
         {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "Неверные учетные данные");
+                return View("~/Views/Home/Login.cshtml", model);
+            }
 
-            var user = _mapper.Map<User>(model);
+            var result = await _signInManager.PasswordSignInAsync(   
+                user.UserName, // Используем UserName вместо Email
+                model.Password,
+                model.RememberMe,
+                lockoutOnFailure: false);
 
-            var result = await _signInManager.PasswordSignInAsync(user.Email, model.Password, model.RememberMe, false);
             if (result.Succeeded)
             {
-                if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-                {
-                    return Redirect(model.ReturnUrl);
-                }
-                else
-                {
-                    _logger.LogInformation("Пользователь вошел в систему!Метод Login - Post");
-                    return RedirectToAction("MyPage", "AccountManager");
-                }
+                _logger.LogInformation($"Успешный вход. UserId: {user.Id}");
+                return RedirectToAction("MyPage", "AccountManager");
             }
-            else
-            {
-                ModelState.AddModelError("", "Неправильный логин и (или) пароль");
-            }
+
+            ModelState.AddModelError(string.Empty, "Неверные учетные данные");
         }
-        return View("model"); //Views/Home/Index.cshtml
+
+        return View("~/Views/Home/Login.cshtml", model);
     }
 
     [Route("Logout")]
@@ -83,22 +93,6 @@ public class AccountManagerController : Controller
     {
         await _signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
-    }
-
-    [Authorize]   //только авторизованные пользователи могут попасть на свою страницу.
-    [Route("MyPage")]
-    [HttpGet]
-    public IActionResult MyPage()
-    {
-        // Получаем объект пользователя из контекста HTTP-запроса
-        var user = User;
-
-        // Асинхронно получаем данные пользователя из базы через UserManager
-        var result = _userManager.GetUserAsync(user);
-
-        _logger.LogInformation($"My User: {result} авторизован");
-        // Создаём ViewModel и передаём её в представление "User"
-        return View("User", new UserViewModel(result.Result));
     }
 
     [Authorize]
@@ -146,7 +140,13 @@ public class AccountManagerController : Controller
         var currentuser = User;
         var result = await _userManager.GetUserAsync(currentuser);
 
+
         var list = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
+        if (!string.IsNullOrEmpty(search))
+        {
+            list = list.Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
+        }
+      
         var withfriend = await GetAllFriend();
 
         var data = new List<UserWithFriendExt>();
@@ -175,21 +175,171 @@ public class AccountManagerController : Controller
         return repository.GetFriendsByUser(result);
     }
 
+    private async Task<List<User>> GetAllFriend(User user)
+    {
+        var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+        return repository.GetFriendsByUser(user);
+    }
+
+
     [Route("AddFriend")]
     [HttpPost]
     public async Task<IActionResult> AddFriend(string id)
     {
-        var currentuser = User;
+        var currentuser = User;  // Текущий авторизованный пользователь (из контекста HTTP)
 
-        var result = await _userManager.GetUserAsync(currentuser);
+        var result = await _userManager.GetUserAsync(currentuser);  // Получаем полные данные пользователя из БД
 
         var friend = await _userManager.FindByIdAsync(id);
 
-        var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+        var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;  //преобразовует к FriendRepo т.к. метод в нем, а не в IRepository
 
         repository.AddFriend(result, friend);
 
         return RedirectToAction("MyPage", "AccountManager");
 
+    }
+
+    [Route("DeleteFriend")]
+    [HttpPost]
+    public async Task <IActionResult> DeleteFriend (string id)
+    {
+        var currentuser = User; 
+        var result = await _userManager.GetUserAsync(currentuser);
+        var friend = await _userManager.FindByIdAsync (id);
+
+        var repos = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+        repos.DeleteFriend(result, friend);
+
+        return RedirectToAction("MyPage", "AccountManager");
+    }
+
+    [Authorize]
+    [Route("MyPage")]
+    [HttpGet]
+    public async Task<IActionResult> MyPage()  
+    {
+        try
+        {
+            var user = await _userManager.GetUserAsync(User); //сюда не заходим почему то 
+            if (user == null)
+            {
+                _logger.LogWarning("Поользователь не найдет после аутентификации");
+                return RedirectToAction("Login");
+            }
+
+            _logger.LogInformation($"Загружаем страницу MyPage для : {user.Email}");
+
+            var model = new UserViewModel(user)
+            {
+                Friends = await GetAllFriend(user)
+            };
+
+            return View("User", model);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка в  MyPage");
+            return RedirectToAction("Error", "Home");
+        }
+    }
+
+    [Route("Chat")]
+    [HttpPost]
+    public async Task<IActionResult> Chat(string id)
+    {
+        var currentuser = User;
+
+        var result = await _userManager.GetUserAsync(currentuser);
+        var friend = await _userManager.FindByIdAsync(id);
+
+        var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+
+        var mess = repository.GetMessages(result, friend);
+
+        var model = new ChatViewModel()
+        {
+            You = result,
+            ToWhom = friend,
+            History = mess.OrderBy(x => x.Id).ToList(),
+        };
+        return View("Chat", model);
+    }
+
+    [Route("NewMessage")]
+    [HttpPost]
+    public async Task<IActionResult> NewMessage(string id, ChatViewModel chat)
+    {
+        var currentuser = User;
+
+        var result = await _userManager.GetUserAsync(currentuser);
+        var friend = await _userManager.FindByIdAsync(id);
+
+        var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+
+        var item = new Message()
+        {
+            Sender = result,
+            Recipient = friend,
+            Text = chat.NewMessage.Text,
+        };
+        repository.Create(item);
+
+        var mess = repository.GetMessages(result, friend);
+
+        var model = new ChatViewModel()
+        {
+            You = result,
+            ToWhom = friend,
+            History = mess.OrderBy(x => x.Id).ToList(),
+        };
+        return View("Chat", model);
+    }
+
+    private async Task<ChatViewModel> GenerateChat(string id)
+    {
+        var currentuser = User;
+
+        var result = await _userManager.GetUserAsync(currentuser);
+        var friend = await _userManager.FindByIdAsync(id);
+
+        var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+
+        var mess = repository.GetMessages(result, friend);
+
+        var model = new ChatViewModel()
+        {
+            You = result,
+            ToWhom = friend,
+            History = mess.OrderBy(x => x.Id).ToList(),
+        };
+
+        return model;
+    }
+
+    [Route("Chat")]
+    [HttpGet]
+    public async Task<IActionResult> Chat()
+    {
+
+        var id = Request.Query["id"];
+
+        var model = await GenerateChat(id);
+        return View("Chat", model);
+    }
+
+    [Route("")]
+    [Route("[controller]/[action]")]
+    public IActionResult Index()
+    {
+        if (_signInManager.IsSignedIn(User))
+        {
+            return RedirectToAction("MyPage", "AccountManager");
+        }
+        else
+        {
+            return View(new MainViewModel());
+        }
     }
 }

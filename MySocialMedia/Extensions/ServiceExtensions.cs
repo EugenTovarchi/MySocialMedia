@@ -1,5 +1,5 @@
 ﻿using MySocialMedia.Models.Repositories;
-using MySocialMedia.Models.Repositoriesж;
+using MySocialMedia.Models.UoW;
 
 namespace MySocialMedia.Extensions;
 
