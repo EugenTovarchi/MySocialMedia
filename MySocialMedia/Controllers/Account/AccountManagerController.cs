@@ -153,7 +153,7 @@ public class AccountManagerController : Controller
     public async Task<IActionResult> UserList(string search)
     {
         var model = await CreateSearch(search);
-        return View( model); //"UserList",
+        return View("UserList", model); //
     }
 
    
@@ -332,7 +332,7 @@ public class AccountManagerController : Controller
 
         var withfriend = await GetAllFriend();
 
-        var data = new List<UserWithFriendExt>();
+        var data = new List<UserWithFriendExt>();   //Проверяется, является ли пользователь другом (есть ли он в списке друзей)
         list.ForEach(x =>
         {
             var t = _mapper.Map<UserWithFriendExt>(x);

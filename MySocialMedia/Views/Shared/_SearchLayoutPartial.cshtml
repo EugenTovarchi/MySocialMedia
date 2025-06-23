@@ -1,18 +1,17 @@
-﻿@using MySocialMedia.ViewModels.Account
-@model dynamic
+﻿ @using MySocialMedia.ViewModels.Account
 
 <div class="righ-align">
     <form asp-area="" asp-controller="AccountManager" asp-action="UserList" method="get">
         <i class="fa fa-search"></i>
         <input type="text" placeholder="Поиск" name="search">
 
-        @if (Model != null && Model.UserList.Count > 0)
-        {
-            @foreach (var user in Model.UserList)
+        
+        
+           @*  @foreach (var user in Model.UserList)
             {
                 <div class="mrgn center-align">
                     <img src="@user.Image" alt="@user.GetFullName()"
-                         onerror="this.src='/images/default-avatar.png'">       @* При ошибке выдаем стандартную аву *@
+                         onerror="this.src='/images/default-avatar.png'">       
                     <div>
                         <h3>@user.GetFullName()</h3>
                         @if (!string.IsNullOrWhiteSpace(user.Status))
@@ -25,8 +24,8 @@
                         }
                     </div>
                 </div>
-            }
-        }
+            } *@
+        
     
 
     </form>
