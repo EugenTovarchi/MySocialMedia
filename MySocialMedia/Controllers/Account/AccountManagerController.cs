@@ -96,6 +96,19 @@ public class AccountManagerController : Controller
         return RedirectToAction("Index", "Home");
     }
 
+    [Route("Edit")]
+    [HttpGet]
+    public IActionResult Edit()
+    {
+        var user = User;
+
+        var result = _userManager.GetUserAsync(user);
+
+        var editmodel = _mapper.Map<UserEditViewModel>(result.Result);
+
+        return View("Edit", editmodel);
+    }
+
     [Route("Update")]
     [Authorize]
     [HttpPost]
@@ -128,84 +141,7 @@ public class AccountManagerController : Controller
             ModelState.AddModelError("", "Некорректные данные");
             return View("Edit", model);
         }
-        //if (!ModelState.IsValid)
-        //{
-        //    return View("Edit", model);
-        //}
-
-        //var user = await _userManager.FindByIdAsync(model.UserId);
-        //if (user == null)
-        //{
-        //    _logger.LogInformation("user = null в методе Update");
-        //    return NotFound();
-        //}
-
-        //// Обновляем данные через extension method
-
-        //user.Convert(model);
-
-        //var result = await _userManager.UpdateAsync(user);
-        //if (!result.Succeeded)
-        //{
-        //    foreach (var error in result.Errors)
-        //    {
-        //        ModelState.AddModelError(string.Empty, error.Description);
-        //    }
-        //    return View("Edit", model);
-        //}
-
-        //return RedirectToAction("MyPage");
     }
-
-    //[Authorize]
-    //[HttpPost("Update")]
-    //[ValidateAntiForgeryToken]  //механизм защиты от CSRF (Cross-Site Request Forgery) атак. 
-    //public async Task<IActionResult> Update(UserEditViewModel model)
-    //{
-    //    _logger.LogInformation("Запрос получен. ModelState: {@ModelState}", ModelState);
-    //    _logger.LogInformation("Данные модели: {@Model}", model);
-    //    _logger.LogInformation("Начало обработки Update для пользователя {UserId}", model.UserId);
-
-    //    if (!ModelState.IsValid)
-    //    {
-    //        _logger.LogWarning("Модель не валидна. Ошибки: {@Errors}",
-    //            ModelState.Values.SelectMany(v => v.Errors));
-    //        return View("Edit", model);
-    //    }
-
-    //    try
-    //    {
-    //        var user = await _userManager.FindByIdAsync(model.UserId);
-    //        if (user == null)
-    //        {
-    //            _logger.LogError("Пользователь {UserId} не найден", model.UserId);
-    //            return NotFound();
-    //        }
-
-    //        // Обновляем данные
-    //        user.Convert(model);
-
-    //        var result = await _userManager.UpdateAsync(user);
-    //        if (!result.Succeeded)
-    //        {
-    //            foreach (var error in result.Errors)
-    //            {
-    //                ModelState.AddModelError(string.Empty, error.Description);
-    //                _logger.LogError("Ошибка Identity: {Error}", error.Description);
-    //            }
-    //            return View("Edit", model);
-    //        }
-
-    //        _logger.LogInformation("Профиль пользователя {UserId} успешно обновлен", user.Id);
-    //        return RedirectToAction("MyPage");
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogError(ex, "Ошибка при обновлении профиля");
-    //        ModelState.AddModelError("", "Произошла ошибка при обновлении");
-    //        return View("Edit", model);
-    //    }
-    //}
 
 
     /// <summary>
@@ -217,7 +153,7 @@ public class AccountManagerController : Controller
     public async Task<IActionResult> UserList(string search)
     {
         var model = await CreateSearch(search);
-        return View("UserList", model);
+        return View( model); //"UserList",
     }
 
    
@@ -261,7 +197,7 @@ public class AccountManagerController : Controller
     {
         try
         {
-            var user = await _userManager.GetUserAsync(User); //сюда не заходим почему то 
+            var user = await _userManager.GetUserAsync(User); 
             if (user == null)
             {
                 _logger.LogWarning("Поользователь не найдет после аутентификации");

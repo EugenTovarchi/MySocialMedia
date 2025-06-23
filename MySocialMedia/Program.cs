@@ -28,6 +28,9 @@ namespace MySocialMedia
                 .AddUnitOfWork()
                 .AddCustomRepository<Friend, FriendsRepository>();
 
+            builder.Services.AddScoped<IRepository<Message>, MessageRepository>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
             builder.Services.ConfigureApplicationCookie(options =>

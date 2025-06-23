@@ -1,18 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using MySocialMedia.Configs;
 using MySocialMedia.Models.Users;
-using System.Reflection.Emit;
 
 namespace MySocialMedia.Models.UoW;
 
 public class ApplicationDbContext : IdentityDbContext<User>
 {
     public DbSet<Friend> Friends { get; set; }
+    public DbSet<Message> Messages { get; set; } 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)  
     {
-        Database.Migrate();             //при выходе из конструктора : Страница не найдена без ошибок в логе
     }
     protected override void OnModelCreating(ModelBuilder builder)
     {
