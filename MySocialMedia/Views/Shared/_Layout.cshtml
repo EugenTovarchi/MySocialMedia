@@ -21,15 +21,19 @@
     <header class="border-bottom header background-white">
         <div class="container">
             <div class="topnav">
-                <a asp-area="" asp-controller="Home" asp-action="Index">SocialNetwork</a>
+                @* <a asp-area="" asp-controller="Home" asp-action="Index">SocialNetwork</a> *@
                 @if (SignInManager.IsSignedIn(User))
                 {
+                   <a asp-area="" asp-controller="AccountManager" asp-action="MyPage">SocialNetwork</a>
                     <form asp-controller="AccountManager" asp-action="Logout" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn-logout-alt">Выход</button>
                     </form>
-                }   
-                  <partial name="_SearchLayoutPartial" />
+                }
+                else{
+                    <a asp-area="" asp-controller="Home" asp-action="Index">SocialNetwork</a>
+                }
+                <partial name="_SearchLayoutPartial" />
             </div>
         </div>
     </header>

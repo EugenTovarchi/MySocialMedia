@@ -346,6 +346,7 @@ public class AccountManagerController : Controller
         };
         return model;
     }
+    
 
     private async Task<List<User>> GetAllFriend()
     {

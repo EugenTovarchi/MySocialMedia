@@ -8,8 +8,22 @@
         @foreach (var user in @Model.UserList)
         {
             <div>
-                <label>@user.GetFullName()</label>
-                @if (!@user.IsFriendWithCurrent)
+                <div id="search-ava">
+
+                    <img src="@user.Image" alt="@user.GetFullName()"
+                         onerror="this.src='/images/default-avatar.png'">
+                    <div>
+                        <h3>@user.GetFullName()</h3>
+                        @if (!string.IsNullOrWhiteSpace(user.Status))
+                        {
+                            <p>@user.Status</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(user.About))
+                        {
+                            <p>@user.About</p>
+                        }
+                      </div>
+                </div>
                 {
                     <form asp-controller="AccountManager" asp-action="AddFriend" asp-route-id="@user.Id" method="post">
                         <button type="submit" class="btn btn-sm btn-primary">

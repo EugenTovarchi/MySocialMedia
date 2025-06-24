@@ -148,3 +148,11 @@
     .block-reg .enter_submit:hover {
         background-color: #5B88BD;
     }
+
+#search-ava {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px; /* Закругляем углы */
+    margin-right: 8px;
+    vertical-align: middle;
+}
