@@ -7,13 +7,13 @@ namespace MySocialMedia.Models.Repositories
     {
         protected DbContext _db;
 
-        public DbSet<T> Set
+        public  DbSet<T> Set
         {
             get;
             private set;
         }
 
-        public Repository(ApplicationDbContext db)
+        public   Repository(ApplicationDbContext db)
         {
             _db = db;
             var set = _db.Set<T>();
@@ -22,32 +22,32 @@ namespace MySocialMedia.Models.Repositories
             Set = set;
         }
 
-        public void Create(T item)
+        public async Task Create(T item)
         {
             Set.Add(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public void Delete(T item)
+        public async Task Delete(T item)
         {
             Set.Remove(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public T Get(int id)
+        public async Task <T> Get(int id)
         {
-            return Set.Find(id);
+            return await Set.FindAsync(id);
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task <IEnumerable<T>> GetAll()  
         {
-            return Set;
+            return await _db.Set<T>().ToListAsync();
         }
 
-        public void Update(T item)
+        public async Task Update(T item)
         {
             Set.Update(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
     }
 }

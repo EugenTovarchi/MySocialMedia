@@ -170,7 +170,7 @@ public class AccountManagerController : Controller
 
         var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;  //преобразовует к FriendRepo т.к. метод в нем, а не в IRepository
 
-        repository.AddFriend(result, friend);
+        await repository.AddFriend(result, friend);
 
         return RedirectToAction("MyPage", "AccountManager");
 
@@ -185,7 +185,7 @@ public class AccountManagerController : Controller
         var friend = await _userManager.FindByIdAsync (id);
 
         var repos = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
-        repos.DeleteFriend(result, friend);
+        await repos.DeleteFriend(result, friend);
 
         return RedirectToAction("MyPage", "AccountManager");
     }
@@ -231,7 +231,7 @@ public class AccountManagerController : Controller
 
         var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
 
-        var mess = repository.GetMessages(result, friend);
+        var mess = await repository.GetMessages(result, friend);
 
         var model = new ChatViewModel()
         {
@@ -259,15 +259,16 @@ public class AccountManagerController : Controller
             Recipient = friend,
             Text = chat.NewMessage.Text,
         };
-        repository.Create(item);
+        await repository.Create(item);
+        await _unitOfWork.SaveChanges();
 
-        var mess = repository.GetMessages(result, friend);
+        var mess = await repository.GetMessages(result, friend);
 
         var model = new ChatViewModel()
         {
             You = result,
             ToWhom = friend,
-            History = mess.OrderBy(x => x.Id).ToList(),
+            History = mess.OrderBy(x => x.Id).ToList(), 
         };
         return View("Chat", model);
     }
@@ -279,15 +280,15 @@ public class AccountManagerController : Controller
         var result = await _userManager.GetUserAsync(currentuser);
         var friend = await _userManager.FindByIdAsync(id);
 
-        var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+        var repository =  _unitOfWork.GetRepository<Message>() as MessageRepository;
 
-        var mess = repository.GetMessages(result, friend);
+        var message = await repository.GetMessages(result, friend);
 
         var model = new ChatViewModel()
         {
             You = result,
             ToWhom = friend,
-            History = mess.OrderBy(x => x.Id).ToList(),
+            History = message.OrderBy(x => x.Id).ToList(),
         };
 
         return model;
@@ -356,14 +357,14 @@ public class AccountManagerController : Controller
 
         var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
 
-        return repository.GetFriendsByUser(result);
+        return await repository.GetFriendsByUser(result);
     }
 
     private async Task<List<User>> GetAllFriend(User user)
     {
         var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
 
-        return repository.GetFriendsByUser(user);
+        return await repository.GetFriendsByUser(user);
     }
 
 }
