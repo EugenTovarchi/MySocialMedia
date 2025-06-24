@@ -29,4 +29,4 @@ public enum Months
     [Display(Name = "Декабрь")]
     Dec = 12
 }
-//Html.GetEnumSelectList<MySocalMedia.Views.ViewModels.Months>()
+

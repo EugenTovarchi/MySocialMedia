@@ -9,7 +9,7 @@
 
 <div class="block-reg background-white">
     <h3 class="center">Редактирование пользователя</h3>
-   @*  <form class="frm" method="post" asp-controller="AccountManager" asp-action="Update"> *@
+
     <form method="post" asp-controller="AccountManager" asp-action="Update">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="UserId" />
@@ -69,7 +69,7 @@
             </div>
         </div>
         <div class="center">
-            <input class="btn_submit" type="submit" value="Сохранить" />  @* А где применение ?  *@
+            <input class="btn_submit" type="submit" value="Сохранить" />  
         </div>
     </form>
 </div>

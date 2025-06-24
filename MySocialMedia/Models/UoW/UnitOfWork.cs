@@ -16,7 +16,8 @@ public class UnitOfWork : IUnitOfWork
 
     public void Dispose()
     {
-
+        _appContext?.Dispose();
+        _repositories?.Clear();
     }
 
     public IRepository<TEntity> GetRepository<TEntity>(bool hasCustomRepository = true) where TEntity : class
@@ -44,8 +45,8 @@ public class UnitOfWork : IUnitOfWork
         return (IRepository<TEntity>)_repositories[type];
 
     }
-    public int SaveChanges(bool ensureAutoHistory = false)
+    public async Task<int> SaveChanges(bool ensureAutoHistory = false)
     {
-        throw new NotImplementedException();
+        return await _appContext.SaveChangesAsync(ensureAutoHistory);
     }
 }

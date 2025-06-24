@@ -1,6 +1,6 @@
 ﻿@model MySocialMedia.ViewModels.Account.ChatViewModel
 
-    @* <meta http-equiv="refresh" content="5"> *@
+    @* <meta http-equiv="refresh" content="5"> *@ @*  убрал автообновление - для тестирования мешает при дебаге *@
 
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.17.0/jquery.validate.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validation.unobtrusive/3.2.10/jquery.validate.unobtrusive.min.js"></script>
@@ -34,8 +34,6 @@
                     <label> У вас пока нет сообщений с  @Model.ToWhom.GetFullName().</label>
                 </div>
             }
-
-
         </div>
 
         <div class="lined-block">

@@ -1,6 +1,6 @@
 ﻿@model MySocialMedia.ViewModels.Account.SearchViewModel
 
-<div class="block-reg background-white">
+<div class="friends-container">
 
     @if (Model.UserList.Count != 0)
     {
@@ -8,9 +8,9 @@
         @foreach (var user in @Model.UserList)
         {
             <div>
-                <div id="search-ava">
+                <div id="friend-card">
 
-                    <img src="@user.Image" alt="@user.GetFullName()"
+                    <img src="@user.Image" class="friend-avatar" alt="@user.GetFullName()"
                          onerror="this.src='/images/default-avatar.png'">
                     <div>
                         <h3>@user.GetFullName()</h3>
@@ -22,15 +22,15 @@
                         {
                             <p>@user.About</p>
                         }
-                      </div>
+                    </div>
                 </div>
-                {
-                    <form asp-controller="AccountManager" asp-action="AddFriend" asp-route-id="@user.Id" method="post">
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            Добавить в друзья
-                        </button>
-                    </form>
-                }
+
+                <form asp-controller="AccountManager" asp-action="AddFriend" asp-route-id="@user.Id" method="post">
+                    <button type="submit" class="btn btn-sm btn-primary min-width-but">
+                        Добавить в друзья
+                    </button>
+                </form>
+
             </div>
         }
     }
@@ -40,6 +40,4 @@
             <label> Поиск не дал результатов.</label>
         </div>
     }
-
-
 </div>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MySocialMedia.Models.UoW;
 using MySocialMedia.Models.Users;
+using System.Collections.Immutable;
 
 namespace MySocialMedia.Models.Repositories;
 
@@ -11,7 +12,7 @@ public class FriendsRepository : Repository<Friend>
 
     }
 
-    public void AddFriend(User target, User Friend)
+    public async Task AddFriend(User target, User Friend)
     {
         var friends = Set.AsEnumerable().FirstOrDefault(x => x.UserId == target.Id && x.CurrentFriendId == Friend.Id);
 
@@ -25,24 +26,28 @@ public class FriendsRepository : Repository<Friend>
                 CurrentFriendId = Friend.Id,
             };
 
-            Create(item);
+            await Create(item);
         }
     }
 
-    public List<User> GetFriendsByUser(User target)
+    public async Task <List<User>> GetFriendsByUser(User target)
     {
-        var friends = Set.Include(x => x.CurrentFriend).Include(x => x.User).AsEnumerable().Where(x => x.User.Id == target.Id).Select(x => x.CurrentFriend);
+        var friends = await Set
+            .Include(x => x.CurrentFriend).Include(x => x.User)
+            .Where(x => x.User.Id == target.Id)
+            .Select(x => x.CurrentFriend)
+            .ToListAsync();
 
-        return friends.ToList();
+        return  friends;
     }
 
-    public void DeleteFriend(User target, User Friend)
+    public async Task DeleteFriend(User target, User Friend)
     {
         var friends = Set.AsEnumerable().FirstOrDefault(x => x.UserId == target.Id && x.CurrentFriendId == Friend.Id);
 
         if (friends != null)
         {
-            Delete(friends);
+            await Delete(friends);
         }
     }
 }

@@ -4,54 +4,56 @@
 @inject UserManager<User> UserManager
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - MySocialMedia</title>
-    <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/base-styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MySocialMedia.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/mainPage.css" />
-    <link rel="stylesheet" href="~/css/base-styles.csss" />
-  
+    <link rel="stylesheet" href="~/css/user-page.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
-<body class="background-main">
-    <header class="border-bottom header background-white">
+<body>
+    <header class="header">
         <div class="container">
-            <div class="topnav">
-                @* <a asp-area="" asp-controller="Home" asp-action="Index">SocialNetwork</a> *@
+            <nav class="navbar">
                 @if (SignInManager.IsSignedIn(User))
                 {
-                   <a asp-area="" asp-controller="AccountManager" asp-action="MyPage">SocialNetwork</a>
-                    <form asp-controller="AccountManager" asp-action="Logout" method="post" class="d-inline">
+                    <a asp-controller="AccountManager" asp-action="MyPage" class="navbar-brand">SocialNetwork</a>
+                    <form asp-controller="AccountManager" asp-action="Logout" method="post">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn-logout-alt">Выход</button>
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt"></i> Выход
+                        </button>
                     </form>
                 }
-                else{
-                    <a asp-area="" asp-controller="Home" asp-action="Index">SocialNetwork</a>
+                else
+                {
+                    <a asp-controller="Home" asp-action="Index" class="navbar-brand">SocialNetwork</a>
                 }
                 <partial name="_SearchLayoutPartial" />
-            </div>
+            </nav>
         </div>
     </header>
-    <div class="container background-main">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
+    <main class="main-content">
         <div class="container">
-            &copy; 2021 - AwesomeNetwork - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            &copy; @DateTime.Now.Year - MySocialMedia
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @RenderSection("Scripts", required: false)
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

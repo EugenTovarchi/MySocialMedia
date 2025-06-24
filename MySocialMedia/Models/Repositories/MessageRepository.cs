@@ -10,18 +10,15 @@ public class MessageRepository : Repository<Message>
     {
     }
 
-    public List<Message> GetMessages(User sender, User recipient)
+    public async Task<List<Message>> GetMessages(User sender, User recipient)
     {
-        Set.Include(x => x.Recipient);
-        Set.Include(x => x.Sender);
+          var query = Set
+           .Include(x => x.Recipient)
+           .Include(x => x.Sender)
+           .Where(x => (x.SenderId == sender.Id && x.RecipientId == recipient.Id) ||
+                      (x.SenderId == recipient.Id && x.RecipientId == sender.Id))
+           .OrderBy(x => x.Id);  
 
-        var from = Set.AsEnumerable().Where(x => x.SenderId == sender.Id && x.RecipientId == recipient.Id).ToList();
-        var to = Set.AsEnumerable().Where(x => x.SenderId == recipient.Id && x.RecipientId == sender.Id).ToList();
-
-        var itog = new List<Message>();
-        itog.AddRange(from);
-        itog.AddRange(to);
-        itog.OrderBy(x => x.Id);
-        return itog;
+        return await query.ToListAsync();
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AspNetCoreGeneratedDocument;
 using MySocialMedia.Extensions;
-using MySocialMedia.Models.Users;
 
 namespace MySocialMedia.ViewModels.Account;
 
