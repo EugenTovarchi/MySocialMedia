@@ -320,32 +320,42 @@ public class AccountManagerController : Controller
 
     private async Task<SearchViewModel> CreateSearch(string search)
     {
-        var currentuser = User;
-        var result = await _userManager.GetUserAsync(currentuser);
+        //var currentuser = User;
+        //var result = await _userManager.GetUserAsync(currentuser);
 
 
-        var list = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
-        if (!string.IsNullOrEmpty(search))
-        {
-            list = list.Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
-        }
+        //var list = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
+        //if (!string.IsNullOrEmpty(search))
+        //{
+        //    list = list.Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
+        //}
 
-        var withfriend = await GetAllFriend();
+        //var withfriend = await GetAllFriend();
 
-        var data = new List<UserWithFriendExt>();   //Проверяется, является ли пользователь другом (есть ли он в списке друзей)
-        list.ForEach(x =>
-        {
-            var t = _mapper.Map<UserWithFriendExt>(x);
-            t.IsFriendWithCurrent = withfriend.Where(y => y.Id == x.Id || x.Id == result.Id).Count() != 0;
-            data.Add(t);
-        });
+        //var data = new List<UserWithFriendExt>();   //Проверяется, является ли пользователь другом (есть ли он в списке друзей)
+        //list.ForEach(x =>
+        //{
+        //    var t = _mapper.Map<UserWithFriendExt>(x);
+        //    t.IsFriendWithCurrent = withfriend.Where(y => y.Id == x.Id || x.Id == result.Id).Count() != 0;
+        //    data.Add(t);
+        //});
 
-        var model = new SearchViewModel()
-        {
-            UserList = data
-        };
-        return model;
+        //var model = new SearchViewModel()
+        //{
+        //    UserList = data
+        //};
+        //return model;
+
+        var currentUser = await _userManager.GetUserAsync(User);
+        var friends = await GetAllFriend();
+
+        var users = _userManager.Users.AsEnumerable()
+            .Where(x => x.GetFullName().ToLower().Contains(search.ToLower()))
+            .ToList();
+
+        return new SearchViewModel(users, currentUser, friends);
     }
+    
 
     private async Task<List<User>> GetAllFriend()
     {

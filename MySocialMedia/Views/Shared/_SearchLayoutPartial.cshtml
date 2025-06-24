@@ -7,7 +7,7 @@
 
         
         
-           @*  @foreach (var user in Model.UserList)
+            @foreach (var user in Model.UserList)
             {
                 <div class="mrgn center-align">
                     <img src="@user.Image" alt="@user.GetFullName()"
@@ -24,11 +24,10 @@
                         }
                     </div>
                 </div>
-            } *@
+            }
         
     
 
     </form>
 </div>
 
-@* Выдает ошибку при добавлении в друзья.  //"UserList", в контроллере убрал временно ! *@

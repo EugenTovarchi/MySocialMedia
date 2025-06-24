@@ -28,8 +28,11 @@
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn-logout-alt">Выход</button>
                     </form>
-                }   
-                  <partial name="_SearchLayoutPartial" />
+                }
+                @{
+                    var searchModel = new SearchViewModel(); // заглушка при которой работает все ок. только не показывается инфа из 2го констр
+                }
+                <partial name="_SearchLayoutPartial" model="searchModel" />
             </div>
         </div>
     </header>
