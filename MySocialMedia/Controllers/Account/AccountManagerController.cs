@@ -60,7 +60,7 @@ public class AccountManagerController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
-        if (ModelState.IsValid)   
+        if (ModelState.IsValid)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
@@ -69,8 +69,8 @@ public class AccountManagerController : Controller
                 return View("~/Views/Home/Login.cshtml", model);
             }
 
-            var result = await _signInManager.PasswordSignInAsync(   
-                user.UserName, 
+            var result = await _signInManager.PasswordSignInAsync(
+                user.UserName,
                 model.Password,
                 model.RememberMe,
                 lockoutOnFailure: false);
@@ -143,7 +143,6 @@ public class AccountManagerController : Controller
         }
     }
 
-
     /// <summary>
     /// Поиск пользователей
     /// </summary>
@@ -156,7 +155,7 @@ public class AccountManagerController : Controller
         return View("UserList", model); //
     }
 
-   
+
 
     [Route("AddFriend")]
     [HttpPost]
@@ -178,11 +177,11 @@ public class AccountManagerController : Controller
 
     [Route("DeleteFriend")]
     [HttpPost]
-    public async Task <IActionResult> DeleteFriend (string id)
+    public async Task<IActionResult> DeleteFriend(string id)
     {
-        var currentuser = User; 
+        var currentuser = User;
         var result = await _userManager.GetUserAsync(currentuser);
-        var friend = await _userManager.FindByIdAsync (id);
+        var friend = await _userManager.FindByIdAsync(id);
 
         var repos = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
         await repos.DeleteFriend(result, friend);
@@ -193,11 +192,11 @@ public class AccountManagerController : Controller
     [Authorize]
     [Route("MyPage")]
     [HttpGet]
-    public async Task<IActionResult> MyPage()  
+    public async Task<IActionResult> MyPage()
     {
         try
         {
-            var user = await _userManager.GetUserAsync(User); 
+            var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 _logger.LogWarning("Поользователь не найдет после аутентификации");
@@ -268,30 +267,9 @@ public class AccountManagerController : Controller
         {
             You = result,
             ToWhom = friend,
-            History = mess.OrderBy(x => x.Id).ToList(), 
+            History = mess.OrderBy(x => x.Id).ToList(),
         };
         return View("Chat", model);
-    }
-
-    private async Task<ChatViewModel> GenerateChat(string id)
-    {
-        var currentuser = User;
-
-        var result = await _userManager.GetUserAsync(currentuser);
-        var friend = await _userManager.FindByIdAsync(id);
-
-        var repository =  _unitOfWork.GetRepository<Message>() as MessageRepository;
-
-        var message = await repository.GetMessages(result, friend);
-
-        var model = new ChatViewModel()
-        {
-            You = result,
-            ToWhom = friend,
-            History = message.OrderBy(x => x.Id).ToList(),
-        };
-
-        return model;
     }
 
     [Route("Chat")]
@@ -347,7 +325,6 @@ public class AccountManagerController : Controller
         };
         return model;
     }
-    
 
     private async Task<List<User>> GetAllFriend()
     {
@@ -367,4 +344,24 @@ public class AccountManagerController : Controller
         return await repository.GetFriendsByUser(user);
     }
 
+    private async Task<ChatViewModel> GenerateChat(string id)
+    {
+        var currentuser = User;
+
+        var result = await _userManager.GetUserAsync(currentuser);
+        var friend = await _userManager.FindByIdAsync(id);
+
+        var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+
+        var message = await repository.GetMessages(result, friend);
+
+        var model = new ChatViewModel()
+        {
+            You = result,
+            ToWhom = friend,
+            History = message.OrderBy(x => x.Id).ToList(),
+        };
+
+        return model;
+    }
 }

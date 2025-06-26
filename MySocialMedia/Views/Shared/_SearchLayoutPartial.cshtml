@@ -1,9 +1,10 @@
-﻿ @using MySocialMedia.ViewModels.Account
-
-<div class="righ-align">
-    <form asp-area="" asp-controller="AccountManager" asp-action="UserList" method="get">
-        <i class="fa fa-search"></i>
-        <input type="text" placeholder="Поиск" name="search">
+﻿<div class="search-box">
+    <form asp-controller="AccountManager" asp-action="UserList" method="get" class="search-form">
+        <div class="input-group">
+            <input type="text" name="search" placeholder="Поиск пользователей..." class="form-control search-input">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
     </form>
 </div>
-

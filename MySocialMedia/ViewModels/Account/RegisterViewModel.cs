@@ -15,11 +15,11 @@ public class RegisterViewModel
 
     [Required]
     [EmailAddress(ErrorMessage = "Некорректный email")]
-    [Display(Name = "Email")]
+    [Display(Name = "Email (он же ваш логин в дальнейшем)")]
     public string EmailReg { get; set; }
 
     // Делаем Login необязательным в форме (скрытым или вычисляемым)
-    [Display(Name = "Никнейм (будет равен email)")]
+    [Display(Name = "Логин (повторите ваш email)")]
     public string Login { get; set; }   // Автоматически берётся из EmailReg
 
     [Required]
@@ -45,8 +45,4 @@ public class RegisterViewModel
     [DataType(DataType.Password)]
     [Display(Name = "Подтвердить пароль")]
     public string PasswordConfirm { get; set; }
-
-    //[Required]
-    //[Display(Name = "Никнейм")]
-    //public string Login { get; set; }
 }

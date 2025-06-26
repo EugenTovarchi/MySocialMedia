@@ -1,6 +1,5 @@
 ﻿namespace MySocialMedia.ViewModels.Account;
 
-using MySocialMedia.Extensions;
 using MySocialMedia.Models.Users;
 
 public class UserViewModel
