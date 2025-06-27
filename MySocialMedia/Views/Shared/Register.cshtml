@@ -29,57 +29,28 @@
         </div>
         
         <div class="form-group">
-            <label class="form-label">Дата рождения</label>
-            <div class="date-selector">
-                <select asp-for="Date" class="form-control date_control" ID="ddlDay">
-                    <option value="">@Model.Date</option>
-                </select>
-                <span asp-validation-for="Date" class="text-danger"></span>
-
-                <select asp-for="Month" class="form-control date_control" asp-items="Html.GetEnumSelectList<MySocialMedia.ViewModels.Account.Months>()" onchange="PopulateDays()" ID="ddlMonth">
-                    <option value="">@Model.Month</option>
-                </select>
-
-                <span asp-validation-for="Month" class="text-danger"></span>
-
-                <select asp-for="Year" class="form-control date_control" ID="ddlYear"
-                        asp-items="Enumerable.Range(DateTime.Now.AddYears(-100).Year, DateTime.Now.AddYears(-14).Year - DateTime.Now.AddYears(-100).Year).Reverse().Select(x=> new SelectListItem(x.ToString(), x.ToString()))"
-                        onchange="PopulateDays()">
-                    <option value="">@Model.Year</option>
-                </select>
-                <span asp-validation-for="Year" class="text-danger"></span>
-            </div>
+            <input asp-for="BirthDate" class="form-control" id="birthDatePicker" />
         </div>
 
         <button type="submit" class="btn btn-primary btn-block">Продолжить регистрацию</button>
     </form>
 
-    @Model.Month
 
     <script src="http://code.jquery.com/jquery-latest.js"></script>
 
-    <script type="text/javascript">
-        function PopulateDays() {
-            var ddlMonth = document.getElementById("ddlMonth");
-            var ddlYear = document.getElementById("ddlYear");
-            var ddlDay = document.getElementById("ddlDay");
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
 
-            var y = ddlYear.options[ddlYear.selectedIndex].value;
-            var m = ddlMonth.options[ddlMonth.selectedIndex].value != 0;
-            if (ddlMonth.options[ddlMonth.selectedIndex].value != 0 && ddlYear.options[ddlYear.selectedIndex].value != 0) {
-                var dayCount = 32 - new Date(ddlYear.options[ddlYear.selectedIndex].value, ddlMonth.options[ddlMonth.selectedIndex].value - 1, 32).getDate();
-                ddlDay.options.length = 0;
-                for (var i = 1; i <= dayCount; i++) {
-                    AddOption(ddlDay, i, i);
-                }
-            }
-        }
-
-        function AddOption(ddl, text, value) {
-            var opt = document.createElement("OPTION");
-            opt.text = text;
-            opt.value = value;
-            ddl.options.add(opt);
-        }
-    </script>
+        <script>
+            flatpickr("#birthDatePicker", {
+                locale: "ru",
+                dateFormat: "d.m.Y",
+                altInput: true,
+                altFormat: "Y-m-d", // ISO формат для сервера
+                defaultDate: new Date().setFullYear(new Date().getFullYear() - 18),
+                maxDate: new Date().setFullYear(new Date().getFullYear() - 14),
+                minDate: new Date().setFullYear(new Date().getFullYear() - 100)
+            });
+        </script>
+    }
 </div>

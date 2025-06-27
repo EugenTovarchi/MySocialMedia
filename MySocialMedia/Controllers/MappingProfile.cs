@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.Extensions.Hosting;
 using MySocialMedia.Extensions;
 using MySocialMedia.Models.Users;
 using MySocialMedia.ViewModels.Account;
-using System.Net;
 
 namespace MySocialMedia.Controllers;
 
@@ -16,10 +13,10 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
 
-        CreateMap<RegisterViewModel, User>()
-            .ForMember(x => x.BirthDate, opt => opt.MapFrom(c => new DateTime((int)c.Year, (int)c.Month, (int)c.Date)))
-            .ForMember(x => x.Email, opt => opt.MapFrom(c => c.EmailReg))
-            .ForMember(x => x.UserName, opt => opt.MapFrom(c => c.Login));
+        CreateMap<RegisterViewModel, User>().ForMember(x => x.BirthDate, opt => opt.MapFrom(src => src.BirthDate));
+        //.ForMember(x => x.BirthDate, opt => opt.MapFrom(c => new DateTime((int)c.Year, (int)c.Month, (int)c.Date)))
+        //.ForMember(x => x.Email, opt => opt.MapFrom(c => c.EmailReg))
+        //.ForMember(x => x.UserName, opt => opt.MapFrom(c => c.Login));
         CreateMap<LoginViewModel, User>();
 
         CreateMap<UserEditViewModel, User>();
@@ -29,8 +26,8 @@ public class MappingProfile : Profile
         CreateMap<User, UserWithFriendExt>();
 
         CreateMap<RegisterViewModel, User>()
-            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.EmailReg))
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.EmailReg));
+            .ForMember(x => x.UserName, opt => opt.MapFrom(src => src.EmailReg))
+            .ForMember(x => x.Email, opt => opt.MapFrom(src => src.EmailReg));
     }
 }
 

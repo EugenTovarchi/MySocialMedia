@@ -22,17 +22,11 @@ public class RegisterViewModel
     [Display(Name = "Логин (повторите ваш email)")]
     public string Login { get; set; }   // Автоматически берётся из EmailReg
 
-    [Required]
-    [Display(Name = "Год")]
-    public int Year { get; set; }
-
-    [Required]
-    [Display(Name = "День")]
-    public int Date { get; set; }
-
-    [Required]
-    [Display(Name = "Месяц")]
-    public int Month { get; set; }
+    [DataType(DataType.Date)]  //указывает что свойство содержит дату без времени
+    [Display(Name = "Дата рождения")]
+    [Required(ErrorMessage = "Пожалуйста, укажите дату рождения")]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]  // задает формат даты и применять формат при редактировании
+    public DateTime BirthDate { get; set; }
 
     [Required]
     [DataType(DataType.Password)]

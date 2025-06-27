@@ -28,7 +28,7 @@ public class RegisterController : Controller
     }
 
     [Route("RegisterPart2")]
-    [HttpGet]
+    [HttpGet]  
     public IActionResult RegisterPart2(RegisterViewModel model)
     {
         return View("RegisterPart2", model); // Показ второй стадии
@@ -44,6 +44,7 @@ public class RegisterController : Controller
             Email = model.EmailReg,
             FirstName = model.FirstName,
             LastName = model.LastName,
+            BirthDate = model.BirthDate, //вот тут была проблема, что дата не передавалась во 2 часть регистрации
         };
 
         var result = await _userManager.CreateAsync(user, model.PasswordReg);
@@ -52,6 +53,7 @@ public class RegisterController : Controller
         {  
             await _signInManager.SignInAsync(user, false);
             _logger.LogInformation($"Пользователь {user.UserName} успешно прошёл регистрацию.");
+            _logger.LogInformation($"Received BirthDate: {model.BirthDate}");
             return RedirectToAction("MyPage", "AccountManager");
         }
 

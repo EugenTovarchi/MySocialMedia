@@ -29,6 +29,8 @@ public class AccountManagerController : Controller
         _logger = logger;
         _unitOfWork = unitOfWork;
     }
+
+    #if DEBUG
     [Route("Generate")]
     [HttpGet]
     public async Task<IActionResult> Generate()
@@ -299,19 +301,24 @@ public class AccountManagerController : Controller
 
     private async Task<SearchViewModel> CreateSearch(string search)
     {
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            _logger.LogError("Введите корректный запрос на поиск пользователя!");
+            return new SearchViewModel { UserList = new List<UserWithFriendExt>() };
+        }
+
         var currentuser = User;
         var result = await _userManager.GetUserAsync(currentuser);
 
 
         var list = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
-        if (!string.IsNullOrEmpty(search))
-        {
-            list = list.Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
-        }
+
+        list = list.Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
 
         var withfriend = await GetAllFriend();
 
         var data = new List<UserWithFriendExt>();   //Проверяется, является ли пользователь другом (есть ли он в списке друзей)
+
         list.ForEach(x =>
         {
             var t = _mapper.Map<UserWithFriendExt>(x);
