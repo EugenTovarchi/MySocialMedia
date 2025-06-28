@@ -1,4 +1,6 @@
 ﻿@using MySocialMedia.ViewModels.Account
+@inject IWebHostEnvironment HostEnvironment
+
 @model MySocialMedia.ViewModels.Account.RegisterViewModel
 
 ﻿@{
@@ -10,6 +12,13 @@
 <script src="https://ajax.aspnetcdn.com/ajax/jquery.validation.unobtrusive/3.2.10/jquery.validate.unobtrusive.min.js"></script>
 
 <div class="auth-block">
+    @if (HostEnvironment.IsDevelopment())
+    {
+        <div class="alert alert-info mb-3">
+            <small>Режим разработки: форма предзаполнена тестовыми данными</small>
+        </div>
+    }
+
     <h4 class="text-center">Впервые с нами?</h4>
     <p class="text-center text-muted">Регистрация нового пользователя</p>
 

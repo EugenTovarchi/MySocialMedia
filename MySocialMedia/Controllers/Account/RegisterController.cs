@@ -23,7 +23,15 @@ public class RegisterController : Controller
 
     [HttpGet]
     public IActionResult Register()
-    {  
+    {
+        var model = new RegisterViewModel();
+
+#if DEBUG
+        // Тестовые данные только в режиме отладки
+        model.FirstName = "Тестовый";
+        model.LastName = "Пользователь";
+        model.BirthDate = DateTime.Now.AddYears(-20); // 20 лет назад
+#endif
         return View("~/Views/Shared/Register.cshtml");
     }
 
@@ -38,6 +46,10 @@ public class RegisterController : Controller
     [HttpPost]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
+#if DEBUG
+        // Логирование тестовых данных
+        _logger.LogDebug($"Регистрация в DEBUG режиме. Данные: {model.FirstName} {model.LastName}, {model.BirthDate}");
+#endif
         var user = new User
         {
             UserName = model.EmailReg,  // Используем EmailReg как UserName
@@ -54,6 +66,7 @@ public class RegisterController : Controller
             await _signInManager.SignInAsync(user, false);
             _logger.LogInformation($"Пользователь {user.UserName} успешно прошёл регистрацию.");
             _logger.LogInformation($"Received BirthDate: {model.BirthDate}");
+
             return RedirectToAction("MyPage", "AccountManager");
         }
 

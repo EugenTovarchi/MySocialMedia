@@ -30,12 +30,11 @@ public class AccountManagerController : Controller
         _unitOfWork = unitOfWork;
     }
 
-    #if DEBUG
+    
     [Route("Generate")]
     [HttpGet]
     public async Task<IActionResult> Generate()
     {
-
         var usergen = new GenetateUsers();
         var userlist = usergen.Populate(35);
 
